@@ -1,23 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import { getList } from './services/list';
+import { Item } from './components/item';
+
+const endpoint = 'https://dog.ceo/api/';
+const random_count = 8; // max 50
+const random_url = endpoint + 'breeds/image/random/' + random_count;
 
 function App() {
+  const [list, setList] = useState([]);
+
+  useEffect(() => {
+    getList(random_url)
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          setList(data.message);
+        } else {
+          throw new Error(data.status);
+        }
+      })
+      .catch(error => {
+        console.log('error: ' + error);
+      });
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="list">
+      {list.map((item, idx) => <Item key={idx} src={item} />)}
     </div>
   );
 }
